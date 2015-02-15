@@ -19,9 +19,8 @@ To use the project you have to do two setups steps
 1. Install [vagrant](https://www.vagrantup.com/)
 2. Add the following lines to your hosts file
 
-
-    `127.0.0.1       bar.localhost`
-    `127.0.0.1       foo.localhost`
+        127.0.0.1       bar.localhost
+        127.0.0.1       foo.localhost
 
 Running
 -------
