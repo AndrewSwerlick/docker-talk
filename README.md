@@ -1,4 +1,5 @@
-== README
+Overview
+---------
 
 This is a sample project developed for a talk on docker and ansible integration.
 
@@ -7,6 +8,8 @@ can forward requests on to multiple docker containers depending on the host mach
 
 The project consists of a vagrant box, provisioned by a series of ansible scripts.
 The box runs docker and two sample rails apps behind an nginx proxy.
+
+This repo also includes the slides from the talk
 
 
 Dependencies and setup
