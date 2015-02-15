@@ -1,0 +1,9 @@
+---
+- name: Create dockerfiles folder
+  file: state=directory path=/root/docker-files/base-rails
+
+- name: Copy up dockerfile for base rails image
+  copy: src=Dockerfile dest=/root/docker-files/base-rails
+
+- name: Build docker image
+  docker_image: path=/root/docker-files/base-rails name="hermann/base-rails" state=build

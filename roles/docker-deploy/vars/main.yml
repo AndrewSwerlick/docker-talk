@@ -1,0 +1,6 @@
+---
+# vars file for herrmann.rails-deploy
+container_name: app
+image_name: image
+env_variables: DUMMY=1
+code_path: "./"

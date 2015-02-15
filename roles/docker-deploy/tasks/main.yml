@@ -1,0 +1,32 @@
+---
+- name: generate temp folder for code
+  command: mktemp -d
+  register: build_folder
+
+- debug: msg="Build folder {{ build_folder.stdout }}"
+
+- name: Copying files to build folder
+  synchronize: src='{{ code_path }}' dest='{{ build_folder.stdout }}' rsync_opts=--no-motd,--filter=':- .gitignore',--filter='- .rsync-filter'
+
+- name: Build docker image
+  docker_image: path="{{ build_folder.stdout }}" name="{{ image_name }}" state=build
+  when: dont_rebuild is not defined
+
+- name: Stop Application
+  docker: image="{{ image_name }}" name="{{ container_name }}" state=stopped
+
+- name: Remove Application
+  docker: image="{{ image_name }}" name="{{ container_name }}" state=absent
+
+- name: Start Application
+  docker:
+    image: "{{ image_name }}"
+    name: "{{ container_name }}"
+    state: running
+    env: "{{ env_variables }}"
+
+- name: delete temporary files
+  file: path={{ build_folder.stdout }} state=absent
+
+- name: Clean up docker
+  command: docker-cleanup.sh

@@ -1,0 +1,10 @@
+---
+- hosts: all
+
+  roles:
+    - { role: docker, sudo: yes, port: 8080 }
+    - { role: nginx-proxy, sudo: yes, port: 8080 }
+    - { role: base-rails-image, sudo: yes }
+    - { role: vagrant-docker, sudo: yes }
+    - { role: docker-deploy, code_path: "./foo/", image_name: proxy/foo, container_name: foo, env_variables: "VIRTUAL_HOST=foo.localhost"}
+    - { role: docker-deploy, code_path: "./bar/", image_name: proxy/bar, container_name: bar, env_variables: "VIRTUAL_HOST=bar.localhost"}

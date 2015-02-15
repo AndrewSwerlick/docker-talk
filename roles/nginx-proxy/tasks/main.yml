@@ -1,0 +1,32 @@
+---
+- name: Create folder for nginx.tmpl
+  file: state=directory path=/etc/docker-gen/templates/
+
+- name: Create folder for nginx config
+  file: state=directory path=/tmp/nginx/
+
+- name: Copy user provided template file
+  copy: src={{conf_template_path}} dest=/etc/docker-gen/templates/nginx.tmpl
+  when: conf_template_path is defined
+
+- name: Copy nginx.tmpl to host
+  copy: src=nginx.tmpl dest=/etc/docker-gen/templates/nginx.tmpl
+  when: conf_template_path is not defined
+
+- name: Stop old nginx container
+  docker: image=nginx name=nginx state=stopped
+
+- name: Remove old nginx container
+  docker: image=nginx name=nginx state=absent
+
+- name: Start nginx container
+  command: docker run -d -t --name nginx -v /tmp/nginx:/etc/nginx/conf.d -v /usr/local/certs:/etc/nginx/certs -v /etc/ssl/keys:/etc/nginx/keys -p {{port}}:80 -p 443:443 nginx
+
+- name: Stop old nginx-gen container
+  docker: image=jwilder/docker-gen name=nginx-gen state=stopped
+
+- name: Remove old nginx-gen container
+  docker: image=jwilder/docker-gen name=nginx-gen state=absent
+
+- name: Start the nginx-gen container
+  command: docker run -d --name nginx-gen --volumes-from nginx -v /var/run/docker.sock:/tmp/docker.sock -v /etc/docker-gen/templates:/etc/docker-gen/templates -t jwilder/docker-gen:0.3.6 -notify-sighup nginx -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf

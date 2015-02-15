@@ -1,0 +1,29 @@
+- name: Add updates key
+  apt_key: keyserver=keyserver.ubuntu.com id=36A1D7869245C8950F966E92D8576A8BA88D21E9
+
+- name: Add docker repository
+  apt_repository: repo='deb https://get.docker.io/ubuntu docker main' update_cache=yes
+
+- name: Install docker package
+  apt: name=lxc-docker state=latest update_cache=yes
+
+- name: Install pip package
+  apt: name=python-pip state=latest update_cache=yes
+
+- name: install docker-py
+  pip: name=docker-py
+
+- name: Add docker group
+  group: name=docker state=present
+
+- name: Create deploy user
+  user: name=deploy groups=docker
+
+- name: Copy docker cleanup script to server
+  copy: src=docker-cleanup.sh dest=/usr/local/sbin/docker-cleanup.sh
+
+- name: Make docker clean up script executable
+  file: path=/usr/local/sbin/docker-cleanup.sh owner=root group=docker mode=0750
+
+- name: schedule cron task to clean up docker
+  cron: name="docker cleanup" hour="2" job="/usr/local/sbin/docker-cleanup.sh" state=present
